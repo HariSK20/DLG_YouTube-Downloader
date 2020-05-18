@@ -1,8 +1,8 @@
-#DLG_YouTube-Downloader
+# DLG_YouTube-Downloader
 
-###** A YouTube Video and Playlist Downloader Using Pytube3 **
+### A YouTube Video and Playlist Downloader Using Pytube3 
 
-#####This currently works in Linux!
+##### This currently works in Linux!
 
 Requirements :
 1. Python 3.6 or above
