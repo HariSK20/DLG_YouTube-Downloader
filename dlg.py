@@ -25,18 +25,18 @@ except:
 	print("An error occured, Sorry")
 	sys.exit()
 
-# Do not touch the following function!! I am Warning you!!
+# I rather not touch this function below,if I were you because it was difficult getting it working!
 def barr(stream, file_handler, bytes_remaining):
 	erase = '\x1b[1A\x1b[2K'
 	w = stream.filesize
 	n = ((abs(w-bytes_remaining)*100)//w)
 #	global s
-	print(" Progress : "+str(n)+"% :  ",end ="")
+	print(" Progress : "+str(n)+"% :  |",end ="")
 	for i in range(n):
 #		print("|",end="|")
 		sys.stdout.write("#")
 #		s=n
-	for i in range(n,101):
+	for i in range(n,100):
 		sys.stdout.write(" ")
 	sys.stdout.write("|")
 	print(erase)
@@ -77,29 +77,37 @@ def get_rfps(vid):
 	path = "/home/hp/Videos"
 	ch = 1
 	print(" Advanced options Menu : ")
-	while(ch != 4):
+	while(ch != 4 ):
 		print(" 1. Select Resolution and FPS ")
 		print(" 2. Set Save path ")
 		print(" 3. Download audio only ")
-		print(" 4. Finish setup and download \n")
+		print(" 4. Finish setup and download")
+		print(" 0. Exit\n")
 		print(" Enter Choice :  ",end = "")
 		ch = int(input())
+		if ch == 0:
+			sys.exit()
 		if ch == 1:
 			print("Available options are :  \n")
-			vid2 = vid.filter(type = "video", progressive = True)			
+			vid2 = vid.filter(type = "video").order_by('resolution')			
 			for i in range(len(vid2)):
-				codes.append([vid2[i].resolution, vid[i].fps])	
+				codes.append([vid2[i].resolution, vid[i].fps, str(vid[i].audio_codec), vid[i].video_codec ])
 			for i in range(len(codes)):
-				print("\t\t| ", str(i+1) , " | Res = ", codes[i][0], " | FPS = ", codes[i][1], " |")
+				print("\t\t| ", str(i+1) , " | Res = ", codes[i][0], " | FPS = ", codes[i][1], " | Audio codec : ", codes[i][2], " | Video Codec : ",codes[i][3], " |")
 			print("\n\tWhich Option do you prefer? : ", end="")
 			c = int(input()) - 1
 			if c < len(codes) and c >=0:
 				print(" Okay! ")
 				fin = vid2[c]
-				ch =4
+				if fin.is_adaptive:
+					print("Downloading Video part and then the audio part, they have to be joined manually")
+					dnld(fin,path,title)
+					fin = vid.filter(type = "audio").order_by('abr').last()
+					title = title + "Audio"
+				ch = 4
 			else:
 				print(" This is not a valid option ! ")
-		elif ch == 2:
+		if ch == 2:
 			print(" The Current location for downloading is : ", end="")
 			print(path)
 			print(" Enter new path in a similar form :  ", end = "")
@@ -112,19 +120,21 @@ def get_rfps(vid):
 #				path2 = p2[i] + "/"
 			try:
 				os.chdir(p2)
-				path = p2
-				ch =4
 			except FileNotFoundError:
 				print(" No such file or directory!! try again")
-				continue			
-		elif ch ==3:
+				continue
+			else:
+				path = p2
+				ch =4
+		if ch ==3:
 			fin = vid.filter(type = "audio").order_by('abr').last()
 			path = "/home/hp/Music"
 			title = directify(fin.title)
 			ch = 4
 		elif ch != 4:
 			print(" Invalid choice !! ")		
-	dnld(fin,path,title)
+	if ch==4:
+		dnld(fin,path,title)
 
 
 def errlist(link, flg):
@@ -218,6 +228,10 @@ def main():
 	listflg=0
 	if 'playlist' in link:
 		listflg =1
+	elif 'user' in link:
+		print(" This is whole channel!! Not downloading that!")
+		main()
+		sys.exit()
 	yt= errlist(link,listflg)
 	if yt == -1:
 		main()
