@@ -1,5 +1,4 @@
-'''Just an example video and a playlist for testing
-   https://www.youtube.com/watch?v=eukOuR4vqjg
+'''https://www.youtube.com/watch?v=eukOuR4vqjg
    https://www.youtube.com/playlist?list=PL-osiE80TeTtoQCKZ03TU5fNfx2UY6U4p
 '''
 
@@ -22,7 +21,8 @@ except ModuleNotFoundError:
 	else:
 		print(" Without it we cannot download videos, forced quit activated!")
 		sys.exit()
-except:
+except Exception as e:
+	print(e)
 	print("An error occured, Sorry")
 	sys.exit()
 
@@ -64,17 +64,52 @@ def dnld(vid,path,title):
 	print("\n")
 	try:
 		vid.download(path,title)
-	except:
-		print(" Some unfortunate error has occured while Downloading \n")
+	except Exception as e:
+		print(" Error!! ")
+		print(e, end="")
+		print(" has occured while Downloading \n")
 #		flg=1
 #	if flg==0:
 #		print(" Video has been downloaded!! ")
-	
+
+
+def post_process(title, path):
+	command = "ffmpeg -i "+title+".webm -i "+title+"Audio.webm -c copy -map 0:v:0 -map 1:a:0 "+title+".mkv"
+	flag = 0
+	try:
+		os.chdir(path)
+	except Exception as e:
+		print(e)
+		sys.exit()
+	try:
+		os.system(command)
+		flag = 1
+	except Exception as e:
+		print(e)
+		print(" The attempt at post processing failed, but don't you worry, the video and audio files are still there!")
+	else:
+		if flag ==1:
+			fl = title +".webm"
+			path2 = os.path.join(path,fl)
+			fl = title +"Audio.webm"
+			path3 = os.path.join(path,fl)
+			try:
+				os.remove(path2)
+				os.remove(path3)
+			except Exception as e:
+				print(e)
+				print(" Post Processing has been successful, but we failed to delete the temporary files!")
+				print(" The End file has the .mkv extension so use that :-)\n")
+			else:
+				print(" Post Processing Complete!!")
+
+
 # Advanced options menu for video
 def get_rfps(vid):
 	codes= []
 	fin = vid.filter(type = 'video',progressive = True).order_by('resolution').last()
 	title = directify(fin.title)
+	process_flag=0
 	path = "/home/hp/Videos"
 	ch = 1
 	print(" Advanced options Menu : ")
@@ -104,7 +139,9 @@ def get_rfps(vid):
 					print("Downloading Video part and then the audio part, they have to be joined manually")
 					dnld(fin,path,title)
 					fin = vid.filter(type = "audio").order_by('abr').last()
+					title2 = title
 					title = title + "Audio"
+					process_flag = 1
 				ch = 4
 			else:
 				print(" This is not a valid option ! ")
@@ -136,6 +173,9 @@ def get_rfps(vid):
 			print(" Invalid choice !! ")		
 	if ch==4:
 		dnld(fin,path,title)
+	if process_flag ==1:
+		print(" Starting post processing!, Dont worry about the messages that come out next :-) ")
+		post_process(title2, path)
 
 
 def errlist(link, flg):
@@ -179,7 +219,8 @@ def playlistd(yt):
 				title = title + '1'
 				continue	
 #				os.mkdir(title)
-			except:
+			except Exception as e:
+				print(e)
 				print(" There is a problem making a new file\n\n")
 				main()
 				sys.exit()
