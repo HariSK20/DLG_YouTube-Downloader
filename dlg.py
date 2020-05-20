@@ -173,9 +173,9 @@ def get_rfps(vid):
 			print(" Invalid choice !! ")		
 	if ch==4:
 		dnld(fin,path,title)
-	if process_flag ==1:
-		print(" Starting post processing!, Dont worry about the messages that come out next :-) ")
-		post_process(title2, path)
+#	if process_flag ==1:
+#		print(" Starting post processing!, Dont worry about the messages that come out next :-) ")
+#		post_process(title2, path)
 
 
 def errlist(link, flg):
