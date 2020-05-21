@@ -15,8 +15,17 @@ The installation is automatic.
 Steps to Use:
 
 1. Clone this Repo
-2. Run dlg.py
-3. While confirming the video/ playlist pressing a/A instead of y/Y will give you access to the **Advanced options** menu!
+2. Open dlg.py and enter your default directory as the path variable on the top of the code.
+3. Save and Run dlg.py
+4. Enter the link and confirm.
+5. The video will be downloaded at the default location!
+
+Tip: While confirming the video/ playlist pressing a/A instead of y/Y will give you access to the **Advanced options** menu!
+
+By default, it will download the highest resolution Progressive Video( Video and audio in a single file). It's usually is 360p.
+So for downloading higher resolution video, go to the advanced options menu and select the resolution from the available.
+
+For playlists it will always be the default untill in the near future we could change that :-).
 
 
 made by Harishankar S Kumar
