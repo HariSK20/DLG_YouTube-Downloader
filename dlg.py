@@ -1,9 +1,13 @@
+# Enter your default path here:
+
+path = "/home/hp/Videos"
+
+
+
 # These are just two example files I used to test this program!
 '''https://www.youtube.com/watch?v=eukOuR4vqjg
    https://www.youtube.com/playlist?list=PL-osiE80TeTtoQCKZ03TU5fNfx2UY6U4p
 '''
-# Enter your default path here:
-path = "/home/hp/Videos"
 
 # Now the whole code part
 import os
