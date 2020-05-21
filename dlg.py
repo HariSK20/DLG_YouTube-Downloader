@@ -1,9 +1,13 @@
 '''https://www.youtube.com/watch?v=eukOuR4vqjg
    https://www.youtube.com/playlist?list=PL-osiE80TeTtoQCKZ03TU5fNfx2UY6U4p
 '''
+# Enter your default path here:
+path = "/home/hp/Videos"
 
+# Now the whole code part
 import os
 import sys
+import re
 try:
 	from pytube import YouTube, Playlist
 except ModuleNotFoundError:
@@ -48,10 +52,20 @@ def complete(stream, file_handle):
 	print("\n Download Complete\n")
 
 
+def direc_regex(s):
+	a = s.replace(" ","_")
+	bad_char = list(set(re.sub('[A-Za-z0-9_]+',"",a)))
+	for i in bad_char:
+		a = a.replace(i,"")
+	return(a)
+
+
 def directify(s, flg=0):
-	r=[' ', '+', '*', '<', '>', '$', '%', '\\', '^', '@', '#', '!']
+	r=[' ', '+', '*', '<', '>', '$', '%', '\\', '^', '@', '#', '!', "(", ")"]
 	if flg ==0:
 		r.append('/')
+	if flg == 2:
+		return(direc_regex(s))
 	a = s
 	for i in r:
 		if i in s:
@@ -73,8 +87,8 @@ def dnld(vid,path,title):
 #		print(" Video has been downloaded!! ")
 
 
-def post_process(title, path):
-	command = "ffmpeg -i "+title+".webm -i "+title+"Audio.webm -c copy -map 0:v:0 -map 1:a:0 "+title+".mkv"
+def post_process(title, path, f1, f2):
+	command = "ffmpeg -i "+f1+" -i "+f2+" -c copy -map 0:v:0 -map 1:a:0 "+title+".mkv"
 	flag = 0
 	try:
 		os.chdir(path)
@@ -89,29 +103,72 @@ def post_process(title, path):
 		print(" The attempt at post processing failed, but don't you worry, the video and audio files are still there!")
 	else:
 		if flag ==1:
-			fl = title +".webm"
-			path2 = os.path.join(path,fl)
-			fl = title +"Audio.webm"
-			path3 = os.path.join(path,fl)
+			path2 = os.path.join(path,f1)
+			path3 = os.path.join(path,f2)
 			try:
 				os.remove(path2)
 				os.remove(path3)
 			except Exception as e:
 				print(e)
 				print(" Post Processing has been successful, but we failed to delete the temporary files!")
-				print(" The End file has the .mkv extension so use that :-)\n")
+#				print(" The End file has the .mkv extension so use that :-)\n")
 			else:
-				print(" Post Processing Complete!!")
+				print("\n Post Processing Complete!!\n")
+
+
+def adv_playlst():
+	global path
+	path2 = path
+	ch =0
+	aflag =0
+	print(" Advanced options Menu : ")
+	while(ch != 3 ):
+		print(" 1. Set Save path ")
+		print(" 2. Download audio only ")
+		print(" 3. Finish setup and start download")
+		print(" 0. Exit\n")
+		print(" Enter Choice :  ",end = "")
+		ch = int(input())
+		if ch == 0:
+			sys.exit()
+		if ch ==1:
+			print(" The Current location for downloading is : ", end="")
+			print(path)
+			print(" Enter new path in a similar form :  ", end = "")
+			p2 = input()
+			print(" Checking for invalid characters and presence of Directory: ", end="")
+			p2 = directify(p2,1)
+#			p2 = p2.split('/')
+#			path2 = ""
+#			for i in range(len(p2)-1):
+#				path2 = p2[i] + "/"
+			try:
+				os.chdir(p2)
+			except FileNotFoundError:
+				print(" No such file or directory!! try again \n")
+				continue
+			else:
+				print(" Done! \n")
+				path2 = p2
+#				ch =3
+		elif ch ==2:
+			print(" Audio only download set \n")
+			aflag = 1
+#			ch=3
+		elif ch != 3:
+			print(" Invalid option Try again \n")
+	return path2, aflag			
 
 
 # Advanced options menu for video
-def get_rfps(vid):
+def adv_video(vid):
 	codes= []
+	global path
 	fin = vid.filter(type = 'video',progressive = True).order_by('resolution').last()
 	title = directify(fin.title)
 	process_flag=0
-	path = "/home/hp/Videos"
 	ch = 1
+	path2 = path
 	print(" Advanced options Menu : ")
 	while(ch != 4 ):
 		print(" 1. Select Resolution and FPS ")
@@ -136,11 +193,16 @@ def get_rfps(vid):
 				print(" Okay! ")
 				fin = vid2[c]
 				if fin.is_adaptive:
-					print("Downloading Video part and then the audio part, they have to be joined manually")
-					dnld(fin,path,title)
-					fin = vid.filter(type = "audio").order_by('abr').last()
+					title = directify(title,2)
+					print("Downloading Video part and then the audio part, We will try to join them\n")
+					f1 = title+"."+fin.subtype
+					print(f1)
+					dnld(fin,path2,title)
+					fin = vid.filter(type = "audio").order_by('abr').last()					
 					title2 = title
 					title = title + "Audio"
+					f2 = title+"."+fin.subtype
+					print(f2)
 					process_flag = 1
 				ch = 4
 			else:
@@ -150,7 +212,7 @@ def get_rfps(vid):
 			print(path)
 			print(" Enter new path in a similar form :  ", end = "")
 			p2 = input()
-			print(" Checking for invalid characters : ")
+			print(" Checking for invalid characters and presence: ", end="")
 			p2 = directify(p2,1)
 #			p2 = p2.split('/')
 #			path2 = ""
@@ -159,23 +221,25 @@ def get_rfps(vid):
 			try:
 				os.chdir(p2)
 			except FileNotFoundError:
-				print(" No such file or directory!! try again")
+				print(" No such file or directory!! try again\n")
 				continue
 			else:
-				path = p2
-				ch =4
+				print(" Done!! \n")
+				path2 = p2
+#				ch =4
 		if ch ==3:
+			print(" Audio only Download mode set\n")
 			fin = vid.filter(type = "audio").order_by('abr').last()
-			path = "/home/hp/Music"
+			path2 = path.replace("Videos","Music")
 			title = directify(fin.title)
-			ch = 4
-		elif ch != 4:
-			print(" Invalid choice !! ")		
+#			ch = 4
+		elif ch not in [1,2,3,4]:
+			print(" Invalid choice !! \n")		
 	if ch==4:
-		dnld(fin,path,title)
-#	if process_flag ==1:
-#		print(" Starting post processing!, Dont worry about the messages that come out next :-) ")
-#		post_process(title2, path)
+		dnld(fin,path2,title)
+	if process_flag ==1:
+		print(" Starting post processing!, Dont worry about the messages that come out next :-) ")
+		post_process(title2, path2, f1, f2)
 
 
 def errlist(link, flg):
@@ -204,13 +268,18 @@ def errlist(link, flg):
 
 def playlistd(yt):
 	l = yt.video_urls
-	print(" The Playlist is "+yt.title()+" . Continue? (press a for downloading audio only) (y/n) : ",end="" )
+	global path
+	path2 = path
+	flag =1
+	aflag = 0
+	print(" The Playlist is "+yt.title()+" . Continue?  (y/n) : ",end="" )
 	ch = input()
-	if ch == 'y' or ch =='Y' or ch =='a' or ch == 'A':
-		path2 = '/home/hp/Videos'
-		title = directify(yt.title())
+	if  ch =='a' or ch == 'A':
+		path2 , aflag = adv_playlst()
+		ch = 'y'
+	if ch == 'y' or ch =='Y':
 		os.chdir(path2)
-		e=1
+		title = directify(yt.title(),2)
 		while(flag ==1):
 			try:
 				os.mkdir(title)
@@ -230,7 +299,7 @@ def playlistd(yt):
 			yt2= errlist(l[i],0)
 			yt2.register_on_complete_callback(complete)
 #			yt2.register_on_progress_callback(barr)
-			if ch == 'a' or ch == 'A':
+			if aflag ==1:
 				vid2 = yt2.streams.filter(type = "audio").order_by('abr').last()
 			else:
 				vid2 = yt2.streams.filter(progressive = True).order_by('resolution').last()			
@@ -239,11 +308,11 @@ def playlistd(yt):
 
 
 def video(yt):
+	global path
 	yt.register_on_complete_callback(complete)
 #	yt.register_on_progress_callback(barr)
 	print("The video is : "+yt.title+ " are you sure?(y/n):  ",end="")
 	ch = input()
-	path = "/home/hp/Videos"
 	if ch == 'y' or ch =='Y':
 		vid = yt.streams.filter(progressive = True, type = "video").last()
 		title = directify(vid.title)
@@ -254,7 +323,7 @@ def video(yt):
 #		sys.exit()
 	elif ch == 'a' or ch == 'A':
 		vid = yt.streams
-		get_rfps(vid)		
+		adv_video(vid)		
 	else:
 		print("I am going to take it as a no ")
 		main()
@@ -271,7 +340,7 @@ def main():
 	if 'playlist' in link:
 		listflg =1
 	elif 'user' in link:
-		print(" This is whole channel!! Not downloading that!")
+		print(" This is a whole channel!! Not downloading that!")
 		main()
 		sys.exit()
 	yt= errlist(link,listflg)
