@@ -1,8 +1,3 @@
-# Enter your default path here:
-
-path = "/home/hp/Videos"
-
-
 
 # These are just two example files I used to test this program!
 '''https://www.youtube.com/watch?v=eukOuR4vqjg
@@ -34,6 +29,52 @@ except Exception as e:
 	print(e)
 	print("An error occured, Sorry")
 	sys.exit()
+
+
+def def_path(i=0,pth=""):
+	if i==0:
+		print("\nSeems like you havent set a default path")
+	if i==1:
+		print("\n Seems that the default path not a proper path, Enter a new path to be set as default! ")	
+	print("\nThe current file path(where this program is stored is : ",end="")
+	s= os.getcwd()	
+	print(s)
+	if i==2:
+		print("\n Previous default folder is :  ",end="")
+		print(pth)
+	while(1):
+		print("\n Enter a path (0 to quit program):  ",end="")
+		pth = input()
+		if pth =='0':
+			sys.exit()
+		try:
+			os.chdir(pth)
+		except FileNotFoundError:
+			print(" This is not a valid path!! Try Again!!")
+		else:
+			break
+	os.chdir(s)
+	os.system("touch path_dlg.txt")
+	fl = open("path_dlg.txt","w")
+	fl.write(pth)
+	fl.close()
+	return(pth)
+
+flg=0
+try:
+	fl = open("path_dlg.txt","r")
+except FileNotFoundError:
+	path = def_path()
+	flg=1
+else:
+	if flg==0:
+		path = fl.read()
+		fl.close()
+	try:
+		os.chdir(path)
+	except FileNotFoundError:
+		def_path(1)
+
 
 # I rather not touch this function below,if I were you because it was difficult getting it working!
 def barr(stream, file_handler, bytes_remaining):
@@ -102,23 +143,27 @@ def post_process(title, path, f1, f2):
 		sys.exit()
 	try:
 		os.system(command)
-		flag = 1
 	except Exception as e:
 		print(e)
 		print(" The attempt at post processing failed, but don't you worry, the video and audio files are still there!")
 	else:
-		if flag ==1:
-			path2 = os.path.join(path,f1)
-			path3 = os.path.join(path,f2)
-			try:
-				os.remove(path2)
-				os.remove(path3)
-			except Exception as e:
-				print(e)
-				print(" Post Processing has been successful, but we failed to delete the temporary files!")
-#				print(" The End file has the .mkv extension so use that :-)\n")
-			else:
-				print("\n Post Processing Complete!!\n")
+		ttl = title+".mkv"
+		for root,dirs,files in os.walk(path):
+			if ttl in files:
+				path2 = os.path.join(path,f1)
+				path3 = os.path.join(path,f2)
+				try:
+					os.remove(path2)
+					os.remove(path3)
+				except Exception as e:
+					print(e)
+					flag=1
+					print(" Post Processing has been successful, but we failed to delete the temporary files!")
+					print(" The End file has the .mkv extension so use that :-)\n")
+				else:
+					break
+		if flag==0:
+			print("\n Post Processing Complete!!\n")
 
 
 def adv_playlst():
@@ -235,7 +280,7 @@ def adv_video(vid):
 		if ch ==3:
 			print(" Audio only Download mode set\n")
 			fin = vid.filter(type = "audio").order_by('abr').last()
-			path2 = path.replace("Videos","Music")
+#			path2 = path.replace("Videos","Music")
 			title = directify(fin.title)
 #			ch = 4
 		elif ch not in [1,2,3,4]:
@@ -336,26 +381,30 @@ def video(yt):
 
 
 def main():
-	print("\nEnter the link to download the video (enter 0 to exit): ")
+	print("\n\nEnter the link to download the video (enter 0 to exit, p to change default folder): ")
 	link = input()
-	if link == "0":
-		sys.exit()
-	print("\t Linking \n")
-	listflg=0
-	if 'playlist' in link:
-		listflg =1
-	elif 'user' in link:
-		print(" This is a whole channel!! Not downloading that!")
+	global path
+	if link == 'p'or link =='P':
+		def_path(2,path)
 		main()
 		sys.exit()
-	yt= errlist(link,listflg)
-	if yt == -1:
-		main()
-		sys.exit()
-	if listflg == 0:
-		video(yt)
-	else:
-		playlistd(yt)
+	if link != "0":
+		print("\t Linking \n")
+		listflg=0
+		if 'playlist' in link:
+			listflg =1
+		elif 'user' in link:
+			print(" This is a whole channel!! Not downloading that!")
+			main()
+			sys.exit()	
+		yt= errlist(link,listflg)
+		if yt == -1:
+			main()
+			sys.exit()
+		if listflg == 0:
+			video(yt)
+		else:
+			playlistd(yt)
 	
 
 if __name__ == '__main__':
