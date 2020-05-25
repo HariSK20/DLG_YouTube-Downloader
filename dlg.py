@@ -54,7 +54,8 @@ def def_path(i=0,pth=""):
 		else:
 			break
 	os.chdir(s)
-	os.system("touch path_dlg.txt")
+	if i==0:
+		os.system("touch path_dlg.txt")
 	fl = open("path_dlg.txt","w")
 	fl.write(pth)
 	fl.close()
