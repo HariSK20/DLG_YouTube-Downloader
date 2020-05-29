@@ -16,7 +16,7 @@ The installation is automatic.
 Steps to Use:
 
 1. Clone this Repo
-2. Run dlg.py
+2. Run dlg.py on a fullscreen terminal
 3. When run for the first time, it will ask for the default download location. Enter it.
 4. Enter the link and confirm.
 5. The video will be downloaded at the default location!
