@@ -2,7 +2,7 @@
 
 ### A YouTube Video and Playlist Downloader Using Pytube3 
 
-##### This currently works in Linux!
+##### This currently works in Linux/Mac!
 
 Requirements :
 1. Python 3.6 or above
@@ -31,4 +31,4 @@ For changing the default download location, open path.txt file and change it or,
 For playlists it will always be the default resolution untill in the near future we could change that :-).
 
 
-made by Harishankar S Kumar@ HariSk20
+made by Harishankar S Kumar@ HariSK20
