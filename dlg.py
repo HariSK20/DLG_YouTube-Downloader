@@ -303,7 +303,7 @@ def errlist(link, flg):
 		print(" Video is not found, please check again")	
 	except pytube.exceptions.ExtractError:
 		print("Sorry an Extraction error has occured")
-	except pytube.exception.VideoUnavailable:
+	except pytube.exceptions.VideoUnavailable:
 		print(" Sorry Video is unavailable for download")	
 	except pytube.exceptions.LiveStreamError:
 		print(" The video link is for a Live Stream, cannot be downloaded now")
