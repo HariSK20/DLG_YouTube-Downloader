@@ -30,5 +30,6 @@ For changing the default download location, open path.txt file and change it or,
 
 For playlists it will always be the default resolution untill in the near future we could change that :-).
 
+For a more "readable" ;-) version, Check out Antony S John's UTuber here: https://github.com/AntonySJohn/UTuber
 
 made by Harishankar S Kumar@ HariSK20
