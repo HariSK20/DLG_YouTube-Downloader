@@ -8,16 +8,29 @@
 import os
 import sys
 import re
+
+def install_pytube():
+	t = 0
+	s = os.system('python3 -m pip install pytube')
+	if(s != 0):
+		t = 1
+		s = os.system('python -m pip install pytube')
+	return((s, t))
+
 try:
-	from pytube import YouTube, Playlist
+#	from pytube import YouTube, Playlist
+	import pytube
 except ModuleNotFoundError:
 	print("Looks like you havent downloaded PyTube in your system. May I?(y/n): ")
 	ch = input()
 	if ch == 'y' or ch =='Y':
-		s = os.system('python3 -m pip install pytube3')
+		s,t = install_pytube()
 		if s == 0:
 			print(" PyTube has been installed successfully!! Lets go")
-			os.system('python3 dlg.py')
+			if(t == 0):
+				os.system('python3 dlg.py')
+			else:
+				os.system('python dlg.py')
 			sys.exit()
 		else:
 			print(" Sorry, we are facing trouble right now, Please try again Later")
@@ -54,8 +67,8 @@ def def_path(i=0,pth=""):
 		else:
 			break
 	os.chdir(s)
-	if i==0:
-		os.system("touch path_dlg.txt")
+	# if i==0:
+	# 	os.system("touch path_dlg.txt")
 	fl = open("path_dlg.txt","w")
 	fl.write(pth)
 	fl.close()
@@ -86,12 +99,16 @@ def barr(stream, file_handler, bytes_remaining):
 	print(" Progress : "+str(n)+"% :  |",end ="")
 	for i in range(n):
 #		print("|",end="|")
-		sys.stdout.write("#")
+		print("#", end="")
+#		sys.stdout.write("#")
 #		s=n
 	for i in range(n,100):
-		sys.stdout.write(" ")
-	sys.stdout.write("|")
-	print(erase)
+#		sys.stdout.write(" ")
+		print(" ", end="")
+	print("|", end ="")
+#	sys.stdout.write("|")
+	print("\r\r", end="")
+#	print(erase)
 #	print("done")
 
 
@@ -296,9 +313,12 @@ def adv_video(vid):
 def errlist(link, flg):
 	try:
 		if flg==0:
-			yt = YouTube(link, on_progress_callback = barr)
+			yt = pytube.YouTube(link, on_progress_callback = barr)
+			print(" Video has been linked ")
 		else:
-			yt = Playlist(link)
+			yt = pytube.Playlist(link)
+			print(" Playlist has been linked ")
+		return(yt)
 	except pytube.exceptions.RegexMatchError:
 		print(" Video is not found, please check again")	
 	except pytube.exceptions.ExtractError:
@@ -309,12 +329,7 @@ def errlist(link, flg):
 		print(" The video link is for a Live Stream, cannot be downloaded now")
 	except:
 		print("Sorry there's a connection Error, Try again")
-		return(-1)
-	if flg == 0:	
-		print(" Video has been linked ")
-	else:
-		print(" Playlist has been linked ")
-	return(yt)
+	return(-1)
 	
 
 def playlistd(yt):
