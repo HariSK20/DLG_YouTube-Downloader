@@ -16,10 +16,11 @@ The installation is automatic.
 Steps to Use:
 
 1. Clone this Repo
-2. Run dlg.py on a fullscreen terminal
-3. When run for the first time, it will ask for the default download location. Enter it.
-4. Enter the link and confirm.
-5. The video will be downloaded at the default location!
+2. Install modules from requirements.txt (Not actually required)
+3. Run dlg.py on a fullscreen terminal
+4. When run for the first time, it will ask for the default download location. Enter it.
+5. Enter the link and confirm.
+6. The video will be downloaded at the default location!
 
 Tip: While confirming the video/ playlist pressing a/A instead of y/Y will give you access to the **Advanced options** menu!
 
