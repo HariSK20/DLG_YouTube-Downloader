@@ -252,7 +252,7 @@ def adv_video(vid):
 			for i in range(len(vid2)):
 				codes.append([vid2[i].resolution, vid[i].fps, str(vid[i].audio_codec), vid[i].video_codec ])
 			for i in range(len(codes)):
-				print("\t\t| ", str(i+1) , " | Res = ", codes[i][0], " | FPS = ", codes[i][1], " | Audio codec : ", codes[i][2], " | Video Codec : ",codes[i][3], " |")
+				print("\t\t| ", str(i+1).center(2) , " | Res = ", codes[i][0].center(5), " | FPS = ", str(codes[i][1]).center(2), " | Audio codec : ", codes[i][2].center(10), " | Video Codec : ",codes[i][3].center(12), " |")
 			print("\n\tWhich Option do you prefer? : ", end="")
 			c = int(input()) - 1
 			if c < len(codes) and c >=0:
