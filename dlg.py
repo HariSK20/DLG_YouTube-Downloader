@@ -1,7 +1,8 @@
 
 # These are just two example files I used to test this program!
-'''https://www.youtube.com/watch?v=eukOuR4vqjg
-   https://www.youtube.com/playlist?list=PL-osiE80TeTtoQCKZ03TU5fNfx2UY6U4p
+'''
+	https://www.youtube.com/watch?v=eukOuR4vqjg
+	https://www.youtube.com/playlist?list=PL-osiE80TeTtoQCKZ03TU5fNfx2UY6U4p
 '''
 
 # Now the whole code part
@@ -90,26 +91,20 @@ else:
 		def_path(1)
 
 
-# I rather not touch this function below,if I were you because it was difficult getting it working!
+# displays progress bar
 def barr(stream, file_handler, bytes_remaining):
 	erase = '\x1b[1A\x1b[2K'
 	w = stream.filesize
 	n = ((abs(w-bytes_remaining)*100)//w)
 #	global s
-	print(" Progress : "+str(n)+"% :  |",end ="")
-	for i in range(n):
-#		print("|",end="|")
-		print("#", end="")
-#		sys.stdout.write("#")
-#		s=n
-	for i in range(n,100):
-#		sys.stdout.write(" ")
-		print(" ", end="")
-	print("|", end ="")
+	progress_bar = " Progress : "+str(n)+"% :  |" + ''.join('#' for i in range(n)) + ''.join(' ' for i in range(n, 100)) + "|"
+	print(progress_bar, flush=True)
+	# sys.stdout.write(progress_bar)
+	# sys.stdout.flush()
 #	sys.stdout.write("|")
 	print("\r\r", end="")
-#	print(erase)
-#	print("done")
+	# print(erase)
+	# print("done")
 
 
 def complete(stream, file_handle):
@@ -140,8 +135,11 @@ def directify(s, flg=0):
 def dnld(vid,path,title):
 	flg = 0
 	print("\n")
+	# print("path = " + path)
+	# print("title" + title)
 	try:
 		vid.download(path,title)
+		# os.rename(path+title, path+title+".mp4")
 	except Exception as e:
 		print(" Error!! ")
 		print(e, end="")
@@ -265,12 +263,13 @@ def adv_video(vid):
 					print("Downloading Video part and then the audio part, We will try to join them\n")
 					f1 = title+"."+fin.subtype
 					print(f1)
-					dnld(fin,path2,title)
+					dnld(fin,path2, f1)
 					fin = vid.filter(type = "audio").order_by('abr').last()					
 					title2 = title
 					title = title + "Audio"
 					f2 = title+"."+fin.subtype
 					print(f2)
+					title = f2
 					process_flag = 1
 				ch = 4
 			else:
@@ -327,8 +326,9 @@ def errlist(link, flg):
 		print(" Sorry Video is unavailable for download")	
 	except pytube.exceptions.LiveStreamError:
 		print(" The video link is for a Live Stream, cannot be downloaded now")
-	except:
+	except Exception as e:
 		print("Sorry there's a connection Error, Try again")
+		print(e)
 	return(-1)
 	
 
@@ -377,7 +377,7 @@ def video(yt):
 	global path
 	yt.register_on_complete_callback(complete)
 #	yt.register_on_progress_callback(barr)
-	print("The video is : "+yt.title+ " are you sure?(y/n):  ",end="")
+	print(" The video is : "+yt.title+ " are you sure?(y/n):  ",end="")
 	ch = input()
 	if ch == 'y' or ch =='Y':
 		vid = yt.streams.filter(progressive = True, type = "video").last()
@@ -391,13 +391,14 @@ def video(yt):
 		vid = yt.streams
 		adv_video(vid)		
 	else:
-		print("I am going to take it as a no ")
+		print(" I am going to take it as a no ")
 		main()
 		sys.exit()
 
 
 def main():
-	print("\n\nEnter the link to download the video (enter 0 to exit, p to change default folder): ")
+	print("\n\n Enter the link to download the video (enter 0 to exit, p to change default folder): ")
+	print(" >>> ", end="")
 	link = input()
 	global path
 	if link == 'p'or link =='P':
